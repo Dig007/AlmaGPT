@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/chat_model.dart';
 import '../repositories/token_manager.dart';
+import 'package:logging/logging.dart';
 
 class ChatRepository {
+  final Logger _logger = Logger('ChatRepository');
+
   Stream<String> sendMessageAndGetResponseStream({
     required List<Message> chatMessages,
     required Function(String) onChunkReceived,
@@ -24,7 +27,6 @@ class ChatRepository {
         ..body = jsonEncode({
           "model": "OPEN_AI_CHATGPT_4_0_CHAT_MODEL",
           "parameters": {
-            "maxTokens": 1000,
             "temperature": 0.7,
             "topP": 1,
             "frequencyPenalty": 0,
@@ -58,9 +60,11 @@ class ChatRepository {
           }
         }
       } else {
+        _logger.severe('Error: ${streamedResponse.statusCode}');
         yield 'Error: ${streamedResponse.statusCode}';
       }
-    } catch (e) {
+    } catch (e, stacktrace) {
+      _logger.severe('Error: $e', e, stacktrace);
       yield 'Error: $e';
     }
   }
