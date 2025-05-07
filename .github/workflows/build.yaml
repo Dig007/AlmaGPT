@@ -10,37 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Clone repository
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
       with:
-        java-version: '17'
-        distribution: 'adopt'
+        channel: beta
+        flutter-version: 3.4.0-282.3.beta  # Ganti dengan versi yang Anda butuhkan
 
-    - name: Install Flutter
-      run: |
-        git clone https://github.com/flutter/flutter.git -b stable
-        echo "${HOME}/flutter/bin" >> $GITHUB_PATH
-        echo "${HOME}/flutter/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
-        flutter doctor    # Pastikan Flutter dapat dijalankan setelah diinstal
-
-    - name: Make Flutter and Dart available
-      run: |
-        echo "${HOME}/flutter/bin" >> $GITHUB_PATH
-        echo "${HOME}/flutter/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
-
-    - name: Confirm Flutter Installation
-      run: flutter doctor
+    - name: Verify Flutter Installation
+      run: flutter --version
 
     - name: Run flutter pub get
-      run: |
-        flutter pub get
+      run: flutter pub get
 
     - name: Build APK
-      run: |
-        flutter build apk --release
+      run: flutter build apk --release
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
