@@ -23,14 +23,18 @@ jobs:
       run: |
         git clone https://github.com/flutter/flutter.git -b stable
         echo "$HOME/flutter/bin" >> $GITHUB_PATH
+        echo "$HOME/flutter/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
+        flutter doctor
         flutter channel stable
         flutter upgrade
 
     - name: Run flutter pub get
-      run: flutter pub get
+      run: |
+        flutter pub get
 
     - name: Build APK
-      run: flutter build apk --release
+      run: |
+        flutter build apk --release
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
