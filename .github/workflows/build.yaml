@@ -1,60 +1,39 @@
-name: Build Flutter Android
+name: Flutter Build
 
-on:
+on: 
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      # Setup Java
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+    - name: Set up JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'adopt'
 
-      # Setup Flutter
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.x' # Latest patch version
-          channel: 'stable'
+    - name: Install Flutter
+      run: |
+        git clone https://github.com/flutter/flutter.git -b stable
+        echo "$HOME/flutter/bin" >> $GITHUB_PATH
+        flutter channel stable
+        flutter upgrade
 
-      # Install dependencies
-      - name: Install dependencies
-        run: flutter pub get
+    - name: Run flutter pub get
+      run: flutter pub get
 
-      # Clean build cache
-      - name: Clean build
-        run: flutter clean
+    - name: Build APK
+      run: flutter build apk --release
 
-      # Run tests with detailed output
-      - name: Run tests
-        continue-on-error: true # Allow continuation for debugging
-        run: |
-          flutter test --machine > test-results.json || true
-          cat test-results.json
-
-      # Build APK
-      - name: Build APK
-        run: flutter build apk --release
-        continue-on-error: true # Temporary for debugging
-
-      # Upload APK artifact
-      - name: Upload APK
-        if: success() || failure() # Upload even if build fails
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 7
-          if-no-files-found: ignore # Don't fail if APK is missing
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release.apk
+        path: build/app/outputs/flutter-apk/app-release.apk
