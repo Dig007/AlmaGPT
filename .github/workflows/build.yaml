@@ -17,26 +17,25 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'  # Diubah ke JDK 17
           distribution: 'temurin'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          build-tools-version: 34.0.0
-          platform-version: android-34
-          ndk-version: 25.2.9519653
+          packages: |
+            platform-tools
+            platforms;android-34
+            build-tools;34.0.0
+            ndk;25.2.9519653
+            cmdline-tools;latest
+          accept-android-sdk-licenses: true
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           flutter-version: '3.22.2'
-
-      - name: Accept Android Licenses
-        run: |
-          yes | sdkmanager --licenses
-          yes | flutter doctor --android-licenses
 
       - name: Get Dependencies
         run: flutter pub get
