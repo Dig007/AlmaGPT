@@ -1,50 +1,62 @@
-name: Build Flutter APK
+name: Build Flutter Android
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # Checkout kode
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Java JDK
-        uses: actions/setup-java@v3
+      # Setup Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          java-version: '17'  # Diubah ke JDK 17
           distribution: 'temurin'
+          java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: |
-            platform-tools
-            platforms;android-34
-            build-tools;34.0.0
-            ndk;25.2.9519653
-            cmdline-tools;latest
-          accept-android-sdk-licenses: true
-
+      # Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.24.x' # Ganti dengan versi Flutter yang diinginkan
           channel: 'stable'
-          flutter-version: '3.22.2'
 
-      - name: Get Dependencies
+      # Install dependencies
+      - name: Install dependencies
         run: flutter pub get
 
+      # Run tests (opsional)
+      - name: Run tests
+        run: flutter test
+
+      # Build APK
       - name: Build APK
         run: flutter build apk --release
 
-      - name: Upload APK Artifact
+      # Build AppBundle (opsional)
+      - name: Build AppBundle
+        run: flutter build appbundle --release
+
+      # Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
+          name: app-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
+
+      # Upload AppBundle artifact (opsional)
+      - name: Upload AppBundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 7
