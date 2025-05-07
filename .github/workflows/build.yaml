@@ -24,10 +24,15 @@ jobs:
         git clone https://github.com/flutter/flutter.git -b stable
         echo "${HOME}/flutter/bin" >> $GITHUB_PATH
         echo "${HOME}/flutter/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
+        flutter doctor    # Pastikan Flutter dapat dijalankan setelah diinstal
+
+    - name: Make Flutter and Dart available
+      run: |
+        echo "${HOME}/flutter/bin" >> $GITHUB_PATH
+        echo "${HOME}/flutter/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
 
     - name: Confirm Flutter Installation
-      run: |
-        flutter doctor
+      run: flutter doctor
 
     - name: Run flutter pub get
       run: |
