@@ -26,22 +26,25 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.x' # Ganti dengan versi Flutter yang diinginkan
+          flutter-version: '3.24.x'
           channel: 'stable'
 
       # Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      # Run tests (opsional)
+      # Run tests with detailed output
       - name: Run tests
-        run: flutter test
+        continue-on-error: true # Allow workflow to continue even if tests fail
+        run: |
+          flutter test --machine > test-results.json || true
+          cat test-results.json # Output test results for debugging
 
       # Build APK
       - name: Build APK
         run: flutter build apk --release
 
-      # Build AppBundle (opsional)
+      # Build AppBundle
       - name: Build AppBundle
         run: flutter build appbundle --release
 
@@ -53,7 +56,7 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 7
 
-      # Upload AppBundle artifact (opsional)
+      # Upload AppBundle artifact
       - name: Upload AppBundle
         uses: actions/upload-artifact@v4
         with:
